@@ -1,7 +1,5 @@
 #import "interfaces.h"
 
-#define prefsID CFSTR("com.atrocity.exsto")
-
 static BOOL EXSTO_ENABLED = YES;
 static double EXSTO_DELAY_SPEED = 0.2;
 static double EXSTO_RADIUS = 80;
@@ -29,8 +27,9 @@ SBIconView* newIconViewForIcon(SBIcon* icon) {
 	%orig;
 
     if(EXSTO_ENABLED){
-
+        
         //initialize arrays
+
         if (exstoGestureArray == nil)
             exstoGestureArray = [[NSMutableArray alloc] init];
         if(exstoFolderArray == nil)
@@ -48,6 +47,8 @@ SBIconView* newIconViewForIcon(SBIcon* icon) {
 
         //actually add the recognizer
 		[self addGestureRecognizer:iconController.EXSTORecognizer];	
+
+        log(@"added the gesture to folder");
 	} 
 }
 %end
@@ -526,6 +527,7 @@ static void reloadPreferences() {
         recog.minimumPressDuration = EXSTO_DELAY_SPEED;
     }
 
+    log(@"prefs loaded success");
 }
 
 static inline void prefsChanged(CFNotificationCenterRef center,
