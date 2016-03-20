@@ -45,6 +45,46 @@
 			<string>Show Notification Glow</string>
 		</dict>
 		<dict>
+			<key>PostNotification</key>
+			<string>com.atrocity.exsto/prefsChanged</string>
+			<key>cell</key>
+			<string>PSSwitchCell</string>
+			<key>default</key>
+			<false/>
+			<key>defaults</key>
+			<string>com.atrocity.exsto</string>
+			<key>key</key>
+			<string>EXSTO_LIMIT_ICONS</string>
+			<key>label</key>
+			<string>Limit Icons</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>label</key>
+			<string>Icon Limit</string>
+		</dict>
+		<dict>
+			<key>PostNotification</key>
+			<string>com.atrocity.exsto/prefsChanged</string>
+			<key>cellClass</key>
+			<string>BetterPSSliderTableCell</string>
+			<key>default</key>
+			<real>20</real>
+			<key>defaults</key>
+			<string>com.atrocity.exsto</string>
+			<key>id</key>
+			<string>EXSTO_MAX_ICONS</string>
+			<key>key</key>
+			<string>EXSTO_MAX_ICONS</string>
+			<key>max</key>
+			<real>100</real>
+			<key>min</key>
+			<real>0</real>
+			<key>showValue</key>
+			<true/>
+		</dict>
+		<dict>
 			<key>cell</key>
 			<string>PSGroupCell</string>
 			<key>label</key>

@@ -6,6 +6,7 @@
 #import <objc/runtime.h>
 #import <substrate.h>
 #import "EXSTOCircleMenuView.h"
+#import "DFContinuousForceTouchGestureRecognizer.h"
 #import "BlurBlur.h"
 
 #define log(z) NSLog(@"[Exsto] %@", z)
@@ -19,6 +20,7 @@
 
 
 @interface SBIconController : NSObject
+-(id)contentView;
 +(id)sharedInstance;
 -(void)_launchIcon:(id)icon;
 -(void)openFolder:(id)folder animated:(BOOL)animated;
@@ -29,6 +31,7 @@
 -(CGFloat)checkAndCalculateAngleBetweenPoints:(NSArray *)points center:(CGPoint)center;
 -(void)updateEXSTOContextPosition:(CGPoint)center withIconCount:(int)count;
 -(NSDictionary *)optionsDictionary;
+-(void)removeExstoView;
 -(void)iconHandleLongPress:(id)press;
 -(EXSTOCircleMenuView *)circleMenuView;
 -(void)setCircleMenuView:(EXSTOCircleMenuView *)value;
@@ -38,6 +41,8 @@
 -(void)setEXSTOFolderApplications:(NSMutableArray *)value;
 -(UILongPressGestureRecognizer *)EXSTORecognizer;
 -(void)setEXSTORecognizer:(UILongPressGestureRecognizer *)value;
+-(DFContinuousForceTouchGestureRecognizer *)EXSTOForceRecognizer;
+-(void)setEXSTOForceRecognizer:(DFContinuousForceTouchGestureRecognizer *)value;
 @end
 
 @interface SBIconViewMap : NSObject
@@ -56,6 +61,7 @@
 - (NSInteger)badgeValue;
 - (id)application;
 - (id)getIconImage:(int)arg1;
+- (id)generateIconImage:(int)arg1;
 @end
 
 @interface SBApplication : NSObject
@@ -68,8 +74,16 @@
 - (void)_setIcon:(SBIcon*)icon animated:(BOOL)animated;
 @end
 
+@interface SBIconListModel : NSObject
+-(id)iconAtIndex:(unsigned)index;
+-(id)icons;
+-(unsigned)numberOfIcons;
+@end
+
 @interface SBFolder : NSObject
 -(id)allIcons; // returns an NSMutableSet
+-(id)visibleIcons; // returns an NSMutableSet
+-(id)lists;
 @property(copy, nonatomic) NSString *displayName;
 @end
 

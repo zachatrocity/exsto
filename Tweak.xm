@@ -1,6 +1,10 @@
 #import "interfaces.h"
 
+static BOOL BETA_EXPIRED = NO;
+
 static BOOL EXSTO_ENABLED = YES;
+static BOOL EXSTO_LIMIT_ICONS = NO;
+static int EXSTO_MAX_ICONS = 0;
 static double EXSTO_DELAY_SPEED = 0.2;
 static double EXSTO_RADIUS = 80;
 static BOOL EXSTO_SHOW_NOTIF_GLOW = YES;
@@ -24,32 +28,54 @@ SBIconView* newIconViewForIcon(SBIcon* icon) {
 
 %hook SBFolderIconView
 -(id)initWithFrame:(CGRect)frame{
-	%orig;
+	id temp = %orig;
 
     if(EXSTO_ENABLED){
         
         //initialize arrays
 
-        if (exstoGestureArray == nil)
-            exstoGestureArray = [[NSMutableArray alloc] init];
-        if(exstoFolderArray == nil)
-            exstoFolderArray = [[NSMutableArray alloc] init];
+        NSDateFormatter* df = [[NSDateFormatter alloc] init];
+        [df setDateFormat:@"MM/dd/yyyy"];
+        NSDate* enteredDate = [df dateFromString:@"3/31/2016"];
+        NSDate * today = [NSDate date];
+        NSComparisonResult result = [today compare:enteredDate];
 
-        //set up gesture recognizer
-    	SBIconController * iconController = [%c(SBIconController) sharedInstance];
-    	iconController.EXSTORecognizer = [[UILongPressGestureRecognizer alloc] initWithTarget:iconController action:@selector(handleExstoHold:)];
+        if(result == NSOrderedAscending){
+            if (exstoGestureArray == nil)
+                exstoGestureArray = [[NSMutableArray alloc] init];
+            if(exstoFolderArray == nil)
+                exstoFolderArray = [[NSMutableArray alloc] init];
+            
+            // if ([[self traitCollection] respondsToSelector:@selector(forceTouchCapability)]){
+            //     if ([[self traitCollection] forceTouchCapability] == UIForceTouchCapabilityAvailable){
+            //         log("Force touch is enabled, using that!");
 
-        iconController.EXSTORecognizer.minimumPressDuration = EXSTO_DELAY_SPEED;
+            //         SBIconController * iconController = [%c(SBIconController) sharedInstance];
+            //         iconController.EXSTOForceRecognizer = [[DFContinuousForceTouchGestureRecognizer alloc] init];
+            //         iconController.EXSTOForceRecognizer.forceTouchDelegate = iconController;
+            //         [self addGestureRecognizer:iconController.EXSTOForceRecognizer]; 
+            //         log("force touch recognizer added");
+            //     }
+            // }else {
+                //no force touch, just do long press
+                SBIconController * iconController = [%c(SBIconController) sharedInstance];
+                iconController.EXSTORecognizer = [[UILongPressGestureRecognizer alloc] initWithTarget:iconController action:@selector(handleExstoHold:)];
 
-        //add objects to arrays for future use
-        [exstoGestureArray addObject: iconController.EXSTORecognizer];
-        [exstoFolderArray addObject: self];
+                iconController.EXSTORecognizer.minimumPressDuration = EXSTO_DELAY_SPEED;
 
-        //actually add the recognizer
-		[self addGestureRecognizer:iconController.EXSTORecognizer];	
-
-        log(@"added the gesture to folder");
+                //actually add the recognizer
+                [self addGestureRecognizer:iconController.EXSTORecognizer]; 
+                //add objects to arrays for future use
+                [exstoGestureArray addObject: iconController.EXSTORecognizer];
+                [exstoFolderArray addObject: self];
+                log(@"added the gesture to folder");
+            //}
+        } else {
+            BETA_EXPIRED = YES;
+        }
 	} 
+
+    return temp;
 }
 %end
 
@@ -60,6 +86,13 @@ SBIconView* newIconViewForIcon(SBIcon* icon) {
 	{
 		if(EXSTO_ENABLED){
 			//do nothing
+            if(BETA_EXPIRED == YES){
+                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Expired" message:@"This beta version of Exsto is expired" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil, nil];
+                [alert show];
+                %orig;
+            } else {
+                //do nothing let exsto do the magic
+            }
 		} else {
 			%orig;
 		}
@@ -83,7 +116,9 @@ SBIconView* newIconViewForIcon(SBIcon* icon) {
         NSMutableArray *notifArray = [[NSMutableArray alloc] init];
 		int iconCount = 0;
 
-		for(SBIcon *icon in [selectedFolder allIcons]){
+        SBIconListModel *sortedList = ([selectedFolder lists])[0];
+
+		for(SBIcon *icon in [sortedList icons]){
 			iconCount++;
 			log(icon);
             //determine if icon has notification
@@ -96,20 +131,28 @@ SBIconView* newIconViewForIcon(SBIcon* icon) {
             } else {
                 [notifArray addObject:[NSNumber numberWithBool:NO]];
             }
+            log(@"added the glow");
 
 			//get image
-			UIImage * iconImage = [icon getIconImage:1];
-
+			UIImage * iconImage = [icon generateIconImage:1];
+            log(@"got the icon image");
 			//add image to array
-			[self.EXSTOImages addObject: iconImage];
+            if(iconImage != nil){
+			    [self.EXSTOImages addObject: iconImage];
+            }
 			[self.EXSTOFolderApplications addObject: icon];
 			log(@"Added icon");
+
+            if(EXSTO_LIMIT_ICONS && iconCount == EXSTO_MAX_ICONS)
+                break;
 		}
 
-    	UIView * contentView = MSHookIvar <UIView *>(self, "_contentView");
+    	//UIView * contentView = MSHookIvar <UIView *>(self, "_contentView");
+        UIView * contentView = [self contentView];
     	//find touch location
     	CGPoint tPoint = [recognizer locationInView:contentView];
-    	
+    	log(contentView);
+
     	//get start location
     	CGPoint startPoint;
         if([iconView isInDock])//folder is in dock
@@ -158,17 +201,30 @@ SBIconView* newIconViewForIcon(SBIcon* icon) {
     }
     else if (recognizer.state == UIGestureRecognizerStateEnded)
     {
-    	//perform clean up
-    	log(@"removing blur");
-    	
-    	[UIView animateWithDuration:0.3 delay:0.0 options:nil
-	    animations:^{
-			EXSTOWindowBlur.alpha = 0.0;
-	    }
-	    completion:^(BOOL finished) { 
-	    	self.circleMenuView = nil;
-	    }];
+    	[self removeExstoView];
     }
+}
+
+%new
+- (void)removeExstoView
+{
+    //perform clean up
+    log(@"removing blur");
+    [UIView animateWithDuration:0.2 delay:0.0 options:nil
+    animations:^{
+        self.circleMenuView.alpha = 0.0;
+    }
+    completion:^(BOOL finished) { 
+        [UIView animateWithDuration:0.3 delay:0.0 options:nil
+        animations:^{
+            EXSTOWindowBlur.alpha = 0.0;
+        }
+        completion:^(BOOL finished) { 
+            self.circleMenuView = nil;
+            self.EXSTOImages = nil;
+            self.EXSTOFolderApplications = nil;
+        }];
+    }];
 }
 
 %new
@@ -249,10 +305,10 @@ SBIconView* newIconViewForIcon(SBIcon* icon) {
     CGFloat topAngle = [self checkAndCalculateAngleBetweenPoints:pointsTop center:menuCenter];
     CGFloat bottomAngle = [self checkAndCalculateAngleBetweenPoints:pointsBottom center:menuCenter];
     
-    //NSLog(@"Left: %f", leftAngle);
-    //NSLog(@"Right: %f", rightAngle);
-    //NSLog(@"Top: %f", topAngle);
-    //NSLog(@"Bottom: %f", bottomAngle);
+    NSLog(@"Left: %f", leftAngle);
+    NSLog(@"Right: %f", rightAngle);
+    NSLog(@"Top: %f", topAngle);
+    NSLog(@"Bottom: %f", bottomAngle);
     
     //
     // Calculate available angle
@@ -347,6 +403,7 @@ SBIconView* newIconViewForIcon(SBIcon* icon) {
     }
     
     totalAngle *= angleModifier;
+    NSLog(@"Total: %f", totalAngle);
     
     EXSTOangle = totalAngle;
     
@@ -486,6 +543,14 @@ SBIconView* newIconViewForIcon(SBIcon* icon) {
 
 %end
 
+//fix for exsto not closing
+%hook UIAlertView
+-(void)show{
+    [[%c(SBIconController) sharedInstance] removeExstoView];
+    %orig;
+}
+%end
+
 static void reloadPreferences() {
     log(@"reload prefs");
     
@@ -498,6 +563,8 @@ static void reloadPreferences() {
     }
 
     EXSTO_ENABLED = !prefs[@"EXSTO_ENABLED"] ? YES : [prefs[@"EXSTO_ENABLED"] boolValue];
+    EXSTO_LIMIT_ICONS = !prefs[@"EXSTO_LIMIT_ICONS"] ? NO : [prefs[@"EXSTO_LIMIT_ICONS"] boolValue];
+    EXSTO_MAX_ICONS = !prefs[@"EXSTO_MAX_ICONS"] ? 0 : [prefs[@"EXSTO_MAX_ICONS"] intValue];
     EXSTO_DELAY_SPEED = !prefs[@"EXSTO_DELAY_SPEED"] ? 0.2 : [prefs[@"EXSTO_DELAY_SPEED"] doubleValue];
     EXSTO_RADIUS = !prefs[@"EXSTO_RADIUS"] ? 80 : [prefs[@"EXSTO_RADIUS"] doubleValue];
     EXSTO_SHOW_NOTIF_GLOW = !prefs[@"EXSTO_SHOW_NOTIF_GLOW"] ? YES : [prefs[@"EXSTO_SHOW_NOTIF_GLOW"] boolValue];
