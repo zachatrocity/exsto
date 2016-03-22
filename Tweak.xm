@@ -341,7 +341,8 @@ SBIconView* newIconViewForIcon(SBIcon* icon) {
         
         totalAngle += leftAngle + topAngle;
         
-        angleModifier = 0.75; //0.85
+        angleModifier = 0.70; //0.85
+        totalAngle *= angleModifier;
     }
     else if (leftAngle < 90.0 && bottomAngle < 90.0) //bottom left corner
     {
@@ -349,7 +350,8 @@ SBIconView* newIconViewForIcon(SBIcon* icon) {
         
         totalAngle += leftAngle + bottomAngle;
         
-        angleModifier = 0.75; //0.85
+        angleModifier = 0.70; //0.85
+        totalAngle *= angleModifier;
     }
     else if (rightAngle < 90.0 && topAngle < 90.0) // top right corner
     {
@@ -357,7 +359,8 @@ SBIconView* newIconViewForIcon(SBIcon* icon) {
         
         totalAngle += rightAngle + topAngle;
         
-        angleModifier = 0.75; //0.85
+        angleModifier = 0.70; //0.85
+        totalAngle *= angleModifier;
     }
     else if (rightAngle < 90.0 && bottomAngle < 90.0) //bottom right corner
     {
@@ -365,47 +368,38 @@ SBIconView* newIconViewForIcon(SBIcon* icon) {
         
         totalAngle += rightAngle + bottomAngle;
         
-        angleModifier = 0.75; //0.85
+        angleModifier = 0.70; //0.85
+        totalAngle *= angleModifier;
     }
     else if (rightAngle < 90.0) //right center
     {
         EXSTOdirection = EXSTOCircleMenuDirectionLeft;
         
-        totalAngle = 360.0 - (2 * (90.0 - rightAngle));
-        
-        angleModifier = 0.80;
+        totalAngle = 180.0;
     }
     else if (leftAngle < 90.0) //left center
     {
         EXSTOdirection = EXSTOCircleMenuDirectionRight;
-        
-        totalAngle = 360.0 - (2 * (90.0 - leftAngle));
-        angleModifier = 0.80;
+        totalAngle = 180.0;
     }
     else if (topAngle < 90.0) //top center
     {
         EXSTOdirection = EXSTOCircleMenuDirectionDown;
         
-        totalAngle = 360.0 - (2 * (90.0 - topAngle));
-        
-        angleModifier = 0.90;
+        totalAngle = 180.0;
     }
     else if (bottomAngle < 90.0) //bottom center
     {
-        totalAngle = 360.0 - (2 * (90.0 - bottomAngle));
-        
-        angleModifier = 0.90;
-        
         EXSTOdirection = EXSTOCircleMenuDirectionUp;
+        totalAngle = 180.0;
     }
     else
     {
         totalAngle = 360.0;
-        
         EXSTOdirection = EXSTOCircleMenuDirectionUp;
     }
     
-    totalAngle *= angleModifier;
+    
     NSLog(@"Total: %f", totalAngle);
     
     EXSTOangle = totalAngle;

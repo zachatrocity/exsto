@@ -229,12 +229,18 @@ NSString* const CIRCLE_MENU_BUTTON_BORDER_WIDTH = @"kCircleMenuButtonBorderWidth
     CGPoint tOrigin = CGPointMake(self.frame.size.width / 2, self.frame.size.height / 2);
     CGFloat tRadius = self.radius;
     int tCounter = 0;
+
+    // issue #1 - align buttons perfectly on circle of max angle is 360.0       
+    if (self.maxAngle == 360.0) {       
+        self.maxAngle = 360.0 - 360.0 / self.buttons.count;     
+    }
+
     for (UIView* tView in self.buttons) {
         CGFloat tCurrentWinkel;
         if (tCounter == 0) {
             tCurrentWinkel = self.startingAngle + 0.0;
         } else if (tCounter > 0 && tCounter < tButtonCount) {
-            tCurrentWinkel = self.startingAngle + (self.maxAngle / (tButtonCount)) * tCounter;
+            tCurrentWinkel = self.startingAngle + (self.maxAngle / (tButtonCount - 1)) * tCounter;
         } else {
             tCurrentWinkel = self.startingAngle + self.maxAngle;
         }
