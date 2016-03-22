@@ -117,35 +117,38 @@ SBIconView* newIconViewForIcon(SBIcon* icon) {
 		int iconCount = 0;
 
         SBIconListModel *sortedList = ([selectedFolder lists])[0];
-
-		for(SBIcon *icon in [sortedList icons]){
-			iconCount++;
-			log(icon);
-            //determine if icon has notification
-            if(EXSTO_SHOW_NOTIF_GLOW){
-                if((int)[icon badgeValue] > 0){
-                    [notifArray addObject:[NSNumber numberWithBool:YES]];
+        for(SBIconListModel *page in [selectedFolder lists]){
+            for(SBIcon *icon in [page icons]){
+                iconCount++;
+                log(icon);
+                //determine if icon has notification
+                if(EXSTO_SHOW_NOTIF_GLOW){
+                    if((int)[icon badgeValue] > 0){
+                        [notifArray addObject:[NSNumber numberWithBool:YES]];
+                    } else {
+                        [notifArray addObject:[NSNumber numberWithBool:NO]];
+                    }
                 } else {
                     [notifArray addObject:[NSNumber numberWithBool:NO]];
                 }
-            } else {
-                [notifArray addObject:[NSNumber numberWithBool:NO]];
-            }
-            log(@"added the glow");
+                log(@"added the glow");
 
-			//get image
-			UIImage * iconImage = [icon generateIconImage:1];
-            log(@"got the icon image");
-			//add image to array
-            if(iconImage != nil){
-			    [self.EXSTOImages addObject: iconImage];
-            }
-			[self.EXSTOFolderApplications addObject: icon];
-			log(@"Added icon");
+                //get image
+                UIImage * iconImage = [icon generateIconImage:1];
+                log(@"got the icon image");
+                //add image to array
+                if(iconImage != nil){
+                    [self.EXSTOImages addObject: iconImage];
+                }
+                [self.EXSTOFolderApplications addObject: icon];
+                log(@"Added icon");
 
-            if(EXSTO_LIMIT_ICONS && iconCount == EXSTO_MAX_ICONS)
-                break;
-		}
+                if(EXSTO_LIMIT_ICONS && iconCount == EXSTO_MAX_ICONS)
+                    break;
+            }
+        }
+
+		
 
     	//UIView * contentView = MSHookIvar <UIView *>(self, "_contentView");
         UIView * contentView = [self contentView];
