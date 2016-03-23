@@ -117,34 +117,41 @@ SBIconView* newIconViewForIcon(SBIcon* icon) {
 		int iconCount = 0;
 
         SBIconListModel *sortedList = ([selectedFolder lists])[0];
+        bool iconLimitMet = false;
         for(SBIconListModel *page in [selectedFolder lists]){
-            for(SBIcon *icon in [page icons]){
-                iconCount++;
-                log(icon);
-                //determine if icon has notification
-                if(EXSTO_SHOW_NOTIF_GLOW){
-                    if((int)[icon badgeValue] > 0){
-                        [notifArray addObject:[NSNumber numberWithBool:YES]];
+            if(!iconLimitMet){
+                for(SBIcon *icon in [page icons]){
+                    iconCount++;
+                    log(icon);
+                    //determine if icon has notification
+                    if(EXSTO_SHOW_NOTIF_GLOW){
+                        if((int)[icon badgeValue] > 0){
+                            [notifArray addObject:[NSNumber numberWithBool:YES]];
+                        } else {
+                            [notifArray addObject:[NSNumber numberWithBool:NO]];
+                        }
                     } else {
                         [notifArray addObject:[NSNumber numberWithBool:NO]];
                     }
-                } else {
-                    [notifArray addObject:[NSNumber numberWithBool:NO]];
-                }
-                log(@"added the glow");
+                    log(@"added the glow");
 
-                //get image
-                UIImage * iconImage = [icon generateIconImage:1];
-                log(@"got the icon image");
-                //add image to array
-                if(iconImage != nil){
-                    [self.EXSTOImages addObject: iconImage];
-                }
-                [self.EXSTOFolderApplications addObject: icon];
-                log(@"Added icon");
+                    //get image
+                    UIImage * iconImage = [icon generateIconImage:1];
+                    log(@"got the icon image");
+                    //add image to array
+                    if(iconImage != nil){
+                        [self.EXSTOImages addObject: iconImage];
+                    }
+                    [self.EXSTOFolderApplications addObject: icon];
+                    log(@"Added icon");
 
-                if(EXSTO_LIMIT_ICONS && iconCount == EXSTO_MAX_ICONS)
-                    break;
+                    if(EXSTO_LIMIT_ICONS && iconCount == EXSTO_MAX_ICONS){
+                        iconLimitMet = true;
+                        break;
+                    }
+                }
+            } else {
+                break;
             }
         }
 
@@ -341,7 +348,7 @@ SBIconView* newIconViewForIcon(SBIcon* icon) {
         
         totalAngle += leftAngle + topAngle;
         
-        angleModifier = 0.70; //0.85
+        angleModifier = 0.65; //0.85
         totalAngle *= angleModifier;
     }
     else if (leftAngle < 90.0 && bottomAngle < 90.0) //bottom left corner
@@ -350,7 +357,7 @@ SBIconView* newIconViewForIcon(SBIcon* icon) {
         
         totalAngle += leftAngle + bottomAngle;
         
-        angleModifier = 0.70; //0.85
+        angleModifier = 0.65; //0.85
         totalAngle *= angleModifier;
     }
     else if (rightAngle < 90.0 && topAngle < 90.0) // top right corner
@@ -359,7 +366,7 @@ SBIconView* newIconViewForIcon(SBIcon* icon) {
         
         totalAngle += rightAngle + topAngle;
         
-        angleModifier = 0.70; //0.85
+        angleModifier = 0.65; //0.85
         totalAngle *= angleModifier;
     }
     else if (rightAngle < 90.0 && bottomAngle < 90.0) //bottom right corner
@@ -368,7 +375,7 @@ SBIconView* newIconViewForIcon(SBIcon* icon) {
         
         totalAngle += rightAngle + bottomAngle;
         
-        angleModifier = 0.70; //0.85
+        angleModifier = 0.65; //0.85
         totalAngle *= angleModifier;
     }
     else if (rightAngle < 90.0) //right center
