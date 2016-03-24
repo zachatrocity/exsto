@@ -1,7 +1,7 @@
 Package: com.atrocity.exsto
 Name: Exsto
 Depends: mobilesubstrate
-Version: 0.0.0.4-1
+Version: 0.0.1.0-1
 Architecture: iphoneos-arm
 Description: Unleash your folders
 Depiction: http://www.zachatrocity.com/repo/depic/com.atrocity.exsto/index.html

@@ -6,7 +6,7 @@
 #import <objc/runtime.h>
 #import <substrate.h>
 #import "EXSTOCircleMenuView.h"
-#import "DFContinuousForceTouchGestureRecognizer.h"
+// #import "DFContinuousForceTouchGestureRecognizer.h"
 #import "BlurBlur.h"
 
 #define log(z) NSLog(@"[Exsto] %@", z)
@@ -41,8 +41,8 @@
 -(void)setEXSTOFolderApplications:(NSMutableArray *)value;
 -(UILongPressGestureRecognizer *)EXSTORecognizer;
 -(void)setEXSTORecognizer:(UILongPressGestureRecognizer *)value;
--(DFContinuousForceTouchGestureRecognizer *)EXSTOForceRecognizer;
--(void)setEXSTOForceRecognizer:(DFContinuousForceTouchGestureRecognizer *)value;
+//-(DFContinuousForceTouchGestureRecognizer *)EXSTOForceRecognizer;
+//-(void)setEXSTOForceRecognizer:(DFContinuousForceTouchGestureRecognizer *)value;
 @end
 
 @interface SBIconViewMap : NSObject
@@ -51,6 +51,14 @@
 
 @interface SBIconImageView : UIView
 -(id)contentsImage;
+@end
+
+@interface SBAlertItemsController : NSObject
+- (void)activateAlertItem:(id)item;
+@end
+
+@interface SBLockScreenManager : NSObject
+-(void)lockUIFromSource:(int)arg1 withOptions:(id)arg2;
 @end
 
 @interface SBIcon : NSObject

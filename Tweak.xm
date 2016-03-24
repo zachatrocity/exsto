@@ -34,13 +34,13 @@ SBIconView* newIconViewForIcon(SBIcon* icon) {
         
         //initialize arrays
 
-        NSDateFormatter* df = [[NSDateFormatter alloc] init];
-        [df setDateFormat:@"MM/dd/yyyy"];
-        NSDate* enteredDate = [df dateFromString:@"3/31/2016"];
-        NSDate * today = [NSDate date];
-        NSComparisonResult result = [today compare:enteredDate];
+        // NSDateFormatter* df = [[NSDateFormatter alloc] init];
+        // [df setDateFormat:@"MM/dd/yyyy"];
+        // NSDate* enteredDate = [df dateFromString:@"3/31/2016"];
+        // NSDate * today = [NSDate date];
+        // NSComparisonResult result = [today compare:enteredDate];
 
-        if(result == NSOrderedAscending){
+        // if(result == NSOrderedAscending){
             if (exstoGestureArray == nil)
                 exstoGestureArray = [[NSMutableArray alloc] init];
             if(exstoFolderArray == nil)
@@ -70,9 +70,9 @@ SBIconView* newIconViewForIcon(SBIcon* icon) {
                 [exstoFolderArray addObject: self];
                 log(@"added the gesture to folder");
             //}
-        } else {
-            BETA_EXPIRED = YES;
-        }
+        // } else {
+        //     BETA_EXPIRED = YES;
+        // }
 	} 
 
     return temp;
@@ -86,13 +86,13 @@ SBIconView* newIconViewForIcon(SBIcon* icon) {
 	{
 		if(EXSTO_ENABLED){
 			//do nothing
-            if(BETA_EXPIRED == YES){
-                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Expired" message:@"This beta version of Exsto is expired" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil, nil];
-                [alert show];
-                %orig;
-            } else {
-                //do nothing let exsto do the magic
-            }
+            // if(BETA_EXPIRED == YES){
+            //     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Expired" message:@"This beta version of Exsto is expired" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil, nil];
+            //     [alert show];
+            //     %orig;
+            // } else {
+            //     //do nothing let exsto do the magic
+            // }
 		} else {
 			%orig;
 		}
@@ -555,6 +555,20 @@ SBIconView* newIconViewForIcon(SBIcon* icon) {
 }
 %end
 
+%hook SBAlertItemsController
+- (void)activateAlertItem:(id)item
+{
+    [[%c(SBIconController) sharedInstance] removeExstoView];
+    %orig;
+}
+%end
+
+%hook SBLockScreenManager
+-(void)lockUIFromSource:(int)arg1 withOptions:(id)arg2{
+    [[%c(SBIconController) sharedInstance] removeExstoView];
+    %orig;
+}
+%end
 static void reloadPreferences() {
     log(@"reload prefs");
     
