@@ -9,7 +9,7 @@ You're welcome to learn from this code, but don't repackage it as your own. As a
 #Screenshots
 | Corners  | Edges |  Settings |
 | ------------- | ------------- | ------------- |
-| ![Image 1](https://github.com/zachatrocity/exsto/blob/master/IMG_0313.PNG)  | ![Image 2](https://github.com/zachatrocity/exsto/blob/master/exsto.gif)  | ![Image 3](https://github.com/zachatrocity/exsto/blob/master/IMG_0313.JPG)  |
+| ![Image 1](https://github.com/zachatrocity/exsto/blob/master/IMG_0313.PNG)  | ![Image 2](https://github.com/zachatrocity/exsto/raw/master/exsto.gif)  | ![Image 3](https://github.com/zachatrocity/exsto/blob/master/IMG_0313.JPG)  |
 
 
 #Libraries 
