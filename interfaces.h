@@ -10,19 +10,18 @@
 #import "BlurBlur.h"
 
 #define log(z) NSLog(@"[Exsto] %@", z)
-#define prefsID CFSTR("com.atrocity.exsto")
+#define prefsID CFSTR("com.zachatrocity.exsto")
 
 #define TWEAK_NAME @"exsto"
 #define TWEAK_BUNDLE_PATH [NSString stringWithFormat:@"/Library/PreferenceBundles/%@.bundle", TWEAK_NAME]
 
 // #define TWEAK_PREFS_COLOR [UIColor colorWithRed:0.08f green:0.75f blue:0.85f alpha:1.f]
 
-
-
 @interface SBIconController : NSObject
 -(id)contentView;
 +(id)sharedInstance;
 -(void)_launchIcon:(id)icon;
+-(void)setIsEditing:(BOOL)arg1;
 -(void)openFolder:(id)folder animated:(BOOL)animated;
 -(NSArray *)anglesBetweenPointA:(CGPoint)a pointB:(CGPoint)b pointC:(CGPoint)c;
 -(BOOL)point:(CGPoint)c isOnLineFromPointA:(CGPoint)a toPointB:(CGPoint)b;
@@ -98,5 +97,18 @@
 @interface SBFolderIconView : UIView
 -(id)folder;
 -(id)initWithFrame:(CGRect)frame;
+-(id)type;
 -(BOOL)isInDock;
+@end
+
+@interface SBApplicationShortcutMenu : NSObject
+- (void)iconHandleLongPress:(id)arg1;
+- (void)menuContentView:(id)arg1 activateShortcutItem:(id)arg2 index:(long long)arg3;
+@end
+
+@interface SBApplicationShortcutItem : NSObject
+@end
+
+@interface SBApplicationShortcutMenuContentView : NSObject
+- (id)initWithInitialFrame:(struct CGRect)arg1 containerBounds:(struct CGRect)arg2 orientation:(long long)arg3 shortcutItems:(NSArray <UIApplicationShortcutItem *>*)arg4 application:(SBApplication*)arg5;
 @end

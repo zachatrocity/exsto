@@ -1,8 +1,7 @@
 #import "interfaces.h"
 
-static BOOL BETA_EXPIRED = NO;
-
-static BOOL EXSTO_ENABLED = YES;
+//static BOOL EXSTO_ENABLED = YES;
+static BOOL EXSTO_GESTURES_DISABLED = NO;
 static BOOL EXSTO_LIMIT_ICONS = NO;
 static int EXSTO_MAX_ICONS = 0;
 static double EXSTO_DELAY_SPEED = 0.2;
@@ -19,61 +18,39 @@ static _UIBackdropView *EXSTOWindowBlur;
 static NSMutableArray *exstoGestureArray;
 static NSMutableArray *exstoFolderArray;
 
-SBIconView* newIconViewForIcon(SBIcon* icon) {
-    SBIconView* iconView = [[%c(SBIconView) alloc] initWithDefaultSize];
-    [iconView _setIcon:icon animated:YES];
-    iconView.delegate = [%c(SBIconController) sharedInstance];
-    return iconView;
-}
-
 %hook SBFolderIconView
 -(id)initWithFrame:(CGRect)frame{
 	id temp = %orig;
 
-    if(EXSTO_ENABLED){
-        
+    log([self type]);
+    //quick center support
+    if([self type] != nil){
+        log(@"i am a quick center folder");
+        return temp;
+    }
+
+    //if(EXSTO_ENABLED){
         //initialize arrays
+        if (exstoGestureArray == nil)
+            exstoGestureArray = [[NSMutableArray alloc] init];
+        if(exstoFolderArray == nil)
+            exstoFolderArray = [[NSMutableArray alloc] init];
+        
+        //TODO: add force touch
+        //else
+        //no force touch, just do long press
+        SBIconController * iconController = [%c(SBIconController) sharedInstance];
+        iconController.EXSTORecognizer = [[UILongPressGestureRecognizer alloc] initWithTarget:iconController action:@selector(handleExstoHold:)];
 
-        // NSDateFormatter* df = [[NSDateFormatter alloc] init];
-        // [df setDateFormat:@"MM/dd/yyyy"];
-        // NSDate* enteredDate = [df dateFromString:@"3/31/2016"];
-        // NSDate * today = [NSDate date];
-        // NSComparisonResult result = [today compare:enteredDate];
+        iconController.EXSTORecognizer.minimumPressDuration = EXSTO_DELAY_SPEED;
 
-        // if(result == NSOrderedAscending){
-            if (exstoGestureArray == nil)
-                exstoGestureArray = [[NSMutableArray alloc] init];
-            if(exstoFolderArray == nil)
-                exstoFolderArray = [[NSMutableArray alloc] init];
-            
-            // if ([[self traitCollection] respondsToSelector:@selector(forceTouchCapability)]){
-            //     if ([[self traitCollection] forceTouchCapability] == UIForceTouchCapabilityAvailable){
-            //         log("Force touch is enabled, using that!");
-
-            //         SBIconController * iconController = [%c(SBIconController) sharedInstance];
-            //         iconController.EXSTOForceRecognizer = [[DFContinuousForceTouchGestureRecognizer alloc] init];
-            //         iconController.EXSTOForceRecognizer.forceTouchDelegate = iconController;
-            //         [self addGestureRecognizer:iconController.EXSTOForceRecognizer]; 
-            //         log("force touch recognizer added");
-            //     }
-            // }else {
-                //no force touch, just do long press
-                SBIconController * iconController = [%c(SBIconController) sharedInstance];
-                iconController.EXSTORecognizer = [[UILongPressGestureRecognizer alloc] initWithTarget:iconController action:@selector(handleExstoHold:)];
-
-                iconController.EXSTORecognizer.minimumPressDuration = EXSTO_DELAY_SPEED;
-
-                //actually add the recognizer
-                [self addGestureRecognizer:iconController.EXSTORecognizer]; 
-                //add objects to arrays for future use
-                [exstoGestureArray addObject: iconController.EXSTORecognizer];
-                [exstoFolderArray addObject: self];
-                log(@"added the gesture to folder");
-            //}
-        // } else {
-        //     BETA_EXPIRED = YES;
-        // }
-	} 
+        //actually add the recognizer
+        [self addGestureRecognizer:iconController.EXSTORecognizer]; 
+        //add objects to arrays for future use
+        [exstoGestureArray addObject: iconController.EXSTORecognizer];
+        [exstoFolderArray addObject: self];
+        log(@"added the gesture to folder");
+	//} 
 
     return temp;
 }
@@ -84,22 +61,47 @@ SBIconView* newIconViewForIcon(SBIcon* icon) {
 -(void)iconHandleLongPress:(id)press{
 	if ([press isKindOfClass: %c(SBFolderIconView)])
 	{
-		if(EXSTO_ENABLED){
-			//do nothing
-            // if(BETA_EXPIRED == YES){
-            //     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Expired" message:@"This beta version of Exsto is expired" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil, nil];
-            //     [alert show];
-            //     %orig;
-            // } else {
-            //     //do nothing let exsto do the magic
-            // }
-		} else {
-			%orig;
-		}
+        if(EXSTO_GESTURES_DISABLED){
+            %log(@"make the jitter happen");
+            %orig; //Let the jitter take control
+        } 
+        //else
+        %log(@"Exsto Magic");
+		//do nothing, let the Exsto Long press recognizers handle it
 	}
 	else{
+        //its not a folder, so disable exsto for a little while and let jitter mode take over
+        log(@"remove the gestures");
+
+        if(exstoGestureArray != nil && exstoFolderArray != nil){
+            for (int i = 0; i < [exstoFolderArray count]; ++i)
+            {
+                //remove recognizer
+                [exstoFolderArray[i] removeGestureRecognizer: exstoGestureArray[i]];
+                EXSTO_GESTURES_DISABLED = YES;
+            }
+        }
+
 		%orig;
 	}
+}
+
+-(void)setIsEditing:(BOOL)arg1{
+    if(!arg1){ //done editing
+        if (EXSTO_GESTURES_DISABLED) {
+            //add them back
+            if(exstoGestureArray != nil && exstoFolderArray != nil){
+                for (int i = 0; i < [exstoFolderArray count]; ++i)
+                {
+                    //add recognizer
+                    [exstoFolderArray[i] addGestureRecognizer: exstoGestureArray[i]];
+                    EXSTO_GESTURES_DISABLED = NO;
+                }
+            }
+        }
+    }
+
+    %orig;
 }
 
 %new
@@ -116,7 +118,6 @@ SBIconView* newIconViewForIcon(SBIcon* icon) {
         NSMutableArray *notifArray = [[NSMutableArray alloc] init];
 		int iconCount = 0;
 
-        SBIconListModel *sortedList = ([selectedFolder lists])[0];
         bool iconLimitMet = false;
         for(SBIconListModel *page in [selectedFolder lists]){
             if(!iconLimitMet){
@@ -580,33 +581,35 @@ static void reloadPreferences() {
         CFRelease(keyList);
     }
 
-    EXSTO_ENABLED = !prefs[@"EXSTO_ENABLED"] ? YES : [prefs[@"EXSTO_ENABLED"] boolValue];
+    //EXSTO_ENABLED = !prefs[@"EXSTO_ENABLED"] ? YES : [prefs[@"EXSTO_ENABLED"] boolValue];
     EXSTO_LIMIT_ICONS = !prefs[@"EXSTO_LIMIT_ICONS"] ? NO : [prefs[@"EXSTO_LIMIT_ICONS"] boolValue];
     EXSTO_MAX_ICONS = !prefs[@"EXSTO_MAX_ICONS"] ? 0 : [prefs[@"EXSTO_MAX_ICONS"] intValue];
     EXSTO_DELAY_SPEED = !prefs[@"EXSTO_DELAY_SPEED"] ? 0.2 : [prefs[@"EXSTO_DELAY_SPEED"] doubleValue];
     EXSTO_RADIUS = !prefs[@"EXSTO_RADIUS"] ? 80 : [prefs[@"EXSTO_RADIUS"] doubleValue];
     EXSTO_SHOW_NOTIF_GLOW = !prefs[@"EXSTO_SHOW_NOTIF_GLOW"] ? YES : [prefs[@"EXSTO_SHOW_NOTIF_GLOW"] boolValue];
 
-    if(EXSTO_ENABLED == NO){
-        log(@"remove the gestures");
+    // if(!EXSTO_ENABLED){
+    //     log(@"remove the gestures");
 
-        if(exstoGestureArray != nil && exstoFolderArray != nil){
-            for (int i = 0; i < [exstoFolderArray count]; ++i)
-            {
-                //remove recognizer
-                [exstoFolderArray[i] removeGestureRecognizer: exstoGestureArray[i]];
-            }
-        }
-    } else { 
-        log(@"add the gestures");
-        if(exstoGestureArray != nil && exstoFolderArray != nil){
-            for (int i = 0; i < [exstoFolderArray count]; ++i)
-            {
-                //remove recognizer
-                [exstoFolderArray[i] addGestureRecognizer: exstoGestureArray[i]];
-            }
-        }
-    }
+    //     if(exstoGestureArray != nil && exstoFolderArray != nil){
+    //         for (int i = 0; i < [exstoFolderArray count]; ++i)
+    //         {
+    //             //remove recognizer
+    //             [exstoFolderArray[i] removeGestureRecognizer: exstoGestureArray[i]];
+    //             EXSTO_GESTURES_DISABLED = YES;
+    //         }
+    //     }
+    // } else { 
+    //     log(@"add the gestures");
+    //     if(exstoGestureArray != nil && exstoFolderArray != nil){
+    //         for (int i = 0; i < [exstoFolderArray count]; ++i)
+    //         {
+    //             //add recognizer
+    //             [exstoFolderArray[i] addGestureRecognizer: exstoGestureArray[i]];
+    //             EXSTO_GESTURES_DISABLED = NO;
+    //         }
+    //     }
+    // }
 
     for(UILongPressGestureRecognizer *recog in exstoGestureArray){
         recog.minimumPressDuration = EXSTO_DELAY_SPEED;
@@ -628,6 +631,6 @@ static inline void prefsChanged(CFNotificationCenterRef center,
     reloadPreferences();
 
     CFNotificationCenterRef center = CFNotificationCenterGetDarwinNotifyCenter();
-    CFNotificationCenterAddObserver(center, NULL, &prefsChanged, (CFStringRef)@"com.atrocity.exsto/prefsChanged", NULL, 0);
+    CFNotificationCenterAddObserver(center, NULL, &prefsChanged, (CFStringRef)@"com.zachatrocity.exsto/prefsChanged", NULL, 0);
 	
 }

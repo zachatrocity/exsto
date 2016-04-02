@@ -16,29 +16,29 @@
 			<key>label</key>
 			<string>Settings</string>
 		</dict>
-		<dict>
+		<!-- <dict>
 			<key>PostNotification</key>
-			<string>com.atrocity.exsto/prefsChanged</string>
+			<string>com.zachatrocity.exsto/prefsChanged</string>
 			<key>cell</key>
 			<string>PSSwitchCell</string>
 			<key>default</key>
 			<true/>
 			<key>defaults</key>
-			<string>com.atrocity.exsto</string>
+			<string>com.zachatrocity.exsto</string>
 			<key>key</key>
 			<string>EXSTO_ENABLED</string>
 			<key>label</key>
 			<string>Enabled</string>
-		</dict>
+		</dict> -->
 		<dict>
 			<key>PostNotification</key>
-			<string>com.atrocity.exsto/prefsChanged</string>
+			<string>com.zachatrocity.exsto/prefsChanged</string>
 			<key>cell</key>
 			<string>PSSwitchCell</string>
 			<key>default</key>
 			<true/>
 			<key>defaults</key>
-			<string>com.atrocity.exsto</string>
+			<string>com.zachatrocity.exsto</string>
 			<key>key</key>
 			<string>EXSTO_SHOW_NOTIF_GLOW</string>
 			<key>label</key>
@@ -46,13 +46,13 @@
 		</dict>
 		<dict>
 			<key>PostNotification</key>
-			<string>com.atrocity.exsto/prefsChanged</string>
+			<string>com.zachatrocity.exsto/prefsChanged</string>
 			<key>cell</key>
 			<string>PSSwitchCell</string>
 			<key>default</key>
 			<false/>
 			<key>defaults</key>
-			<string>com.atrocity.exsto</string>
+			<string>com.zachatrocity.exsto</string>
 			<key>key</key>
 			<string>EXSTO_LIMIT_ICONS</string>
 			<key>label</key>
@@ -66,13 +66,13 @@
 		</dict>
 		<dict>
 			<key>PostNotification</key>
-			<string>com.atrocity.exsto/prefsChanged</string>
+			<string>com.zachatrocity.exsto/prefsChanged</string>
 			<key>cellClass</key>
 			<string>BetterPSSliderTableCell</string>
 			<key>default</key>
 			<real>20</real>
 			<key>defaults</key>
-			<string>com.atrocity.exsto</string>
+			<string>com.zachatrocity.exsto</string>
 			<key>id</key>
 			<string>EXSTO_MAX_ICONS</string>
 			<key>key</key>
@@ -92,13 +92,13 @@
 		</dict>
 		<dict>
 			<key>PostNotification</key>
-			<string>com.atrocity.exsto/prefsChanged</string>
+			<string>com.zachatrocity.exsto/prefsChanged</string>
 			<key>cellClass</key>
 			<string>BetterPSSliderTableCell</string>
 			<key>default</key>
 			<real>0.2</real>
 			<key>defaults</key>
-			<string>com.atrocity.exsto</string>
+			<string>com.zachatrocity.exsto</string>
 			<key>id</key>
 			<string>EXSTO_DELAY_SPEED</string>
 			<key>key</key>
@@ -118,13 +118,13 @@
 		</dict>
 		<dict>
 			<key>PostNotification</key>
-			<string>com.atrocity.exsto/prefsChanged</string>
+			<string>com.zachatrocity.exsto/prefsChanged</string>
 			<key>cellClass</key>
 			<string>BetterPSSliderTableCell</string>
 			<key>default</key>
 			<real>80</real>
 			<key>defaults</key>
-			<string>com.atrocity.exsto</string>
+			<string>com.zachatrocity.exsto</string>
 			<key>id</key>
 			<string>EXSTO_RADIUS</string>
 			<key>key</key>

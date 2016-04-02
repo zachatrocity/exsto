@@ -6,4 +6,4 @@
 
 // #define TWEAK_PREFS_COLOR [UIColor colorWithRed:0.08f green:0.75f blue:0.85f alpha:1.f]
 
-#define prefsID CFSTR("com.atrocity.exsto")
+#define prefsID CFSTR("com.zachatrocity.exsto")
