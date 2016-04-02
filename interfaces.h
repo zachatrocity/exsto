@@ -6,8 +6,6 @@
 #import <objc/runtime.h>
 #import <substrate.h>
 #import "EXSTOCircleMenuView.h"
-// #import "DFContinuousForceTouchGestureRecognizer.h"
-#import "BlurBlur.h"
 
 #define log(z) NSLog(@"[Exsto] %@", z)
 #define prefsID CFSTR("com.zachatrocity.exsto")
