@@ -5,6 +5,7 @@
 #import <CoreGraphics/CoreGraphics.h>
 #import <objc/runtime.h>
 #import <substrate.h>
+#import "BlurBlur.h"
 #import "EXSTOCircleMenuView.h"
 
 #define log(z) NSLog(@"[Exsto] %@", z)

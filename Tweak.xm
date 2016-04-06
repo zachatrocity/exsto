@@ -22,11 +22,13 @@ static NSMutableArray *exstoFolderArray;
 -(id)initWithFrame:(CGRect)frame{
 	id temp = %orig;
 
-    log([self type]);
-    //quick center support
-    if([self type] != nil){
-        log(@"i am a quick center folder");
-        return temp;
+    if([self respondsToSelector:@selector(type:)]){
+        log([self type]);
+        //quick center support
+        if([self type] != nil){
+            log(@"i am a quick center folder");
+            return temp;
+        }
     }
 
     //if(EXSTO_ENABLED){
